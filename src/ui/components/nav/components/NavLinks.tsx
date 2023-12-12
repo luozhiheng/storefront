@@ -4,6 +4,13 @@ import { executeGraphQL } from "@/lib/graphql";
 import { MenuGetBySlugDocument } from "@/gql/graphql";
 
 export const NavLinks = async () => {
+	const saleorApiUrl = process.env.NEXT_PUBLIC_SALEOR_API_URL;
+	const reg=RegExp(/\w+\.(\w+)\.com/);
+	const match=reg.test(String(saleorApiUrl));
+	let cmsDomain="http://cms.sjglzx.com/";
+	if(match){
+		cmsDomain="http://cms."+RegExp.$1+".com/";
+	}
 	const navLinks = await executeGraphQL(MenuGetBySlugDocument, {
 		variables: { slug: "navbar" },
 		revalidate: 60 * 60 * 24,
@@ -43,6 +50,7 @@ export const NavLinks = async () => {
 				}
 				return null;
 			})}
+			<NavLink href={cmsDomain}>Blog</NavLink>
 		</>
 	);
 };

@@ -46,12 +46,14 @@ export async function executeGraphQL<Result, Variables>(
 				return "";
 			}
 		})();
+		console.log("*************--errors in body"+body)
 		throw new HTTPError(response, body);
 	}
 
 	const body = (await response.json()) as GraphQLRespone<Result>;
 
 	if ("errors" in body) {
+		console.log("*************--errors in body"+body)
 		throw new GraphQLError(body);
 	}
 

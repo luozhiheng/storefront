@@ -81,6 +81,7 @@ export default async function Page(props: { params: { slug: string }; searchPara
 
 	const variants = product.variants;
 	const selectedVariantID = searchParams.variant;
+	
 	const selectedVariant = variants?.find(({ id }) => id === selectedVariantID);
 
 	async function addItem() {
@@ -94,20 +95,30 @@ export default async function Page(props: { params: { slug: string }; searchPara
 			sameSite: "lax",
 			httpOnly: true,
 		});
-
+		
 		if (!selectedVariantID) {
 			return;
 		}
 
 		// TODO: error handling
-		await executeGraphQL(CheckoutAddLineDocument, {
+		
+		const addResult=await executeGraphQL(CheckoutAddLineDocument, {
 			variables: {
 				id: checkout.id,
 				productVariantId: decodeURIComponent(selectedVariantID),
 			},
 			cache: "no-cache",
-		});
-
+		}) ;
+		if(addResult){
+			if(addResult && addResult?.checkoutLinesAdd?.errors.length > 0){
+				console.log("*********addResult--"+addResult?.checkoutLinesAdd.errors[0])
+				throw new Error(String(addResult?.checkoutLinesAdd.errors[0].message));
+			}
+		}
+		
+		
+		
+		
 		revalidatePath("/cart");
 	}
 
